@@ -5,7 +5,7 @@
  *
  * @category Router
  * @package  SimplePHPOOPMvc
- * @author   Orlando J Betancourth <orlando.betancourth@gmail.com>
+ * @author   Sayd Josue Rodriguez Merlo <saydr2210@gmail.com>
  * @license  MIT http://
  * @version  CVS:1.0.0
  * @link     http://
