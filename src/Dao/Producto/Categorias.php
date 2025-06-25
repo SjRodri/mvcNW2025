@@ -18,4 +18,15 @@ class Categorias extends Table
         $sqlstr = "SELECT * from categorias where id = :id;";
         return self::obtenerUnRegistro($sqlstr, ["id" => $categoriaId]);
     }
+    public static function nuevaCategoria(string $categoria, string $estado)
+    {
+        $sqlstr = "INSERT INTO categorias (categoria, estado) VALUES (:categoria, :estado);";
+        return self::executeNonQuery(
+            $sqlstr,
+            [
+                "categoria" => $categoria,
+                "estado" => $estado
+            ]
+        );
+    }
 }
