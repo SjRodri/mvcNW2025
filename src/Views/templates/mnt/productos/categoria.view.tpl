@@ -8,17 +8,18 @@
                 <div class="row">
                     <label for="id" class="col-12 col-m-4">Id</label>
                     <input readonly type="text" class="col-12 col-m-8" name="id" id="id" value="{{id}}" />
+                    <input type="hidden" name="xsrToken" value="{{xsrToken}}" />
                 </div>
                 <div class="row">
                     <label for="categoria" class="col-12 col-m-4">Categoría</label>
-                    <input type="text" class="col-12 col-m-8" name="categoria" id="categoria" value="{{categoria}}" />
+                    <input type="text" class="col-12 col-m-8" name="categoria" id="categoria" value="{{categoria}}"  {{readonly}}/>
                     {{if error_categoria}} 
                         <span class="error col-12 col-m-8">{{error_categoria}}</span>
                     {{endif error_categoria}}
                 </div>
                 <div class="row">
                     <label for="estado" class="col-12 col-m-4">Estado</label>
-                    <select id="estado" name="estado" >
+                    <select id="estado" name="estado"  {{if readonly}}readonly disabled{{endif readonly}} >
                         <option value="ACT" {{estadoACT}}>Activo</option>
                         <option value="INA" {{estadoINA}}>Inactivo</option>
                         <option value="RTR" {{estadoRTR}}>Retirado</option>
@@ -28,9 +29,18 @@
                     {{endif error_estado}}
                 </div>
                 <div class="row flex-end">
-                    <button id="btnCancel">Cancel</button>
+                    <button id="btnCancel">
+                        {{if showAction}}
+                            Cancel
+                        {{endif showAction}}
+                        {{ifnot showAction}}
+                            Volver
+                        {{endifnot showAction}}
+                    </button>
                     &nbsp;
+                    {{if showAction}}
                     <button class="primary">Confirmar</button>
+                    {{endif showAction}}
                 </div>
                 {{if error_global}}
                     {{foreach error_global}}
@@ -49,4 +59,5 @@
             window.location.assign("index.php?page=Mantenimientos-Productos-Categorias")
         });
     });
+    
 </script>

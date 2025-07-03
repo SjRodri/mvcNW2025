@@ -4,11 +4,13 @@ namespace Controllers\Mantenimientos\Productos;
 
 use Controllers\PublicController;
 use Dao\Producto\Categorias as CategoriasDAO;
+use Error;
 use Utilities\Site;
 use Utilities\Validators;
 use Views\Renderer;
 
 const LIST_URL = "index.php?page=Mantenimientos-Productos-Categorias";
+const XSR_KEY = "xsrToken_categorias";
 
 class Categoria extends PublicController
 {
@@ -33,7 +35,10 @@ class Categoria extends PublicController
             "estadoACT" => "",
             "estadoINA" => "",
             "estadoRTR" => "",
-            "errores" => []
+            "errores" => [],
+            "readonly" => "",
+            "showAction" => true,
+            "xsrToken" => ""
         ];
     }
     public function run(): void
@@ -103,6 +108,10 @@ class Categoria extends PublicController
             $tmpEstado = $_POST["estado"];
             $this->viewData["estado"] = $tmpEstado;
         }
+        if (isset($_POST["xsrToken"])) {
+            $tmpXsrToken = $_POST["xsrToken"];
+            $this->viewData["xsrToken"] = $tmpXsrToken;
+        }
     }
     private function validarDatos()
     {
@@ -111,6 +120,11 @@ class Categoria extends PublicController
         }
         if (!in_array($this->viewData["estado"], $this->estados)) {
             $this->viewData["errores"]["estado"] = "El valor del estado no es correcto";
+        }
+        $tmpXsrToken = $_SESSION[XSR_KEY];
+        if ($this->viewData["xsrToken"] !== $tmpXsrToken) {
+            error_log("Intento ingresar con un token inválido.");
+            $this->throwError("Algo sucedió que impidio procesar la solicitud. Intente de nuevo!!");
         }
     }
 
@@ -134,8 +148,28 @@ class Categoria extends PublicController
                 }
                 break;
             case "UPD":
+                if (
+                    CategoriasDAO::actualizarCategoria(
+                        $this->viewData["id"],
+                        $this->viewData["categoria"],
+                        $this->viewData["estado"]
+                    )
+                ) {
+                    Site::redirectToWithMsg(LIST_URL, "Categoría actualizada existosamente.");
+                } else {
+                    $this->viewData["errores"]["global"] = ["Error al actualizar la categoría."];
+                }
                 break;
             case "DEL":
+                if (
+                    CategoriasDAO::eliminarCategoria(
+                        $this->viewData["id"]
+                    )
+                ) {
+                    Site::redirectToWithMsg(LIST_URL, "Categoría eliminada existosamente.");
+                } else {
+                    $this->viewData["errores"]["global"] = ["Error al eliminar la categoría."];
+                }
                 break;
         }
     }
@@ -152,5 +186,15 @@ class Categoria extends PublicController
                 $this->viewData['error_' . $campo] = $error;
             }
         }
+        // Elementos visuales
+        if ($this->viewData["mode"] === "DEL" ||  $this->viewData["mode"] === "DSP") {
+            $this->viewData["readonly"] = "readonly";
+        }
+        if ($this->viewData["mode"] === "DSP") {
+            $this->viewData["showAction"] = false;
+        }
+
+        $this->viewData["xsrToken"] = hash("sha256", random_int(0, 1000000) . time() . 'categoria' . $this->viewData["mode"]);
+        $_SESSION[XSR_KEY] = $this->viewData["xsrToken"];
     }
 }

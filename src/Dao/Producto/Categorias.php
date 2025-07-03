@@ -29,4 +29,29 @@ class Categorias extends Table
             ]
         );
     }
+
+    public static function actualizarCategoria(int $id, string $categoria, string $estado): int
+    {
+        $sqlstr = "UPDATE categorias set categoria = :categoria, estado = :estado where id = :id;";
+
+        return self::executeNonQuery(
+            $sqlstr,
+            [
+                "categoria" => $categoria,
+                "estado" => $estado,
+                "id" => $id
+            ]
+        );
+    }
+
+    public static function eliminarCategoria(int $id): int
+    {
+        $sqlstr = "DELETE from categorias where id = :id;";
+        return self::executeNonQuery(
+            $sqlstr,
+            [
+                "id" => $id
+            ]
+        );
+    }
 }
